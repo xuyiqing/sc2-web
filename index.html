@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SC² events</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
@@ -39,19 +40,18 @@
   .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:18px 0 8px}
   .navw{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600}
   .navw button{border:1px solid var(--line);background:#fff;border-radius:6px;height:30px;min-width:30px;padding:0 8px;cursor:pointer;font-size:13px;font-family:inherit;color:var(--ink)}
-  .navw .rng{min-width:128px;text-align:center}
+  .navw .rng{min-width:150px;text-align:center}
   .vtoggle{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
   .vtoggle button{border:0;background:#fff;padding:6px 14px;font-size:13px;cursor:pointer;color:var(--mut);font-family:inherit}
   .vtoggle button[aria-pressed="true"]{background:var(--red);color:#fff}
-  .week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden}
-  .wcol{background:#fff;min-height:150px;padding:0 0 6px;display:flex;flex-direction:column}
-  .wh{font-size:11px;font-weight:600;color:var(--faint);text-align:center;padding:6px 0 5px;border-bottom:1px solid var(--line)}
-  .wh b{display:block;font-size:15px;color:var(--ink);font-weight:700}
-  .wh.today b{color:var(--red)}
-  .wh.today{background:var(--red-bg)}
-  .cev{display:block;text-align:left;border:0;border-left:3px solid;border-radius:0 4px 4px 0;padding:3px 6px;margin:4px 4px 0;font-size:11.5px;line-height:1.35;cursor:pointer;font-family:inherit;overflow-wrap:anywhere}
-  .cev .ct{font-weight:600;display:block}
-  .empty-col{font-size:11px;color:#c9c7bf;text-align:center;padding-top:10px}
+  .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .dow{background:var(--bg2);color:var(--faint);font-size:11px;font-weight:600;text-align:center;padding:6px 0}
+  .cell{background:#fff;min-height:98px;padding:4px 4px 6px}
+  .cell.dim{background:#faf9f7}
+  .cell .cnum{font-size:12px;color:var(--mut);text-align:right;line-height:1.4}
+  .cell.today .cnum{color:#fff;background:var(--red);border-radius:999px;width:20px;height:20px;line-height:20px;text-align:center;margin-left:auto;font-weight:700}
+  .mev{display:block;width:100%;text-align:left;border:0;border-left:3px solid;border-radius:0 3px 3px 0;padding:1px 5px;margin-top:3px;font-size:11px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.45;font-family:inherit}
+  .more{font-size:10px;color:var(--faint);margin-top:2px;padding-left:3px}
   .day{margin:18px 0 6px;font-size:13px;font-weight:700;color:var(--mut);border-bottom:1px solid var(--line);padding-bottom:6px}
   .ev{display:flex;gap:12px;align-items:flex-start;padding:11px 6px;border-bottom:1px solid var(--line);cursor:pointer}
   .ev:hover{background:var(--bg2)}
@@ -113,7 +113,7 @@
   <div class="bar">
     <div class="navw" id="nav"></div>
     <div class="vtoggle" id="vtoggle">
-      <button data-v="week" aria-pressed="true">Week</button>
+      <button data-v="month" aria-pressed="true">Month</button>
       <button data-v="list" aria-pressed="false">List</button>
     </div>
   </div>
@@ -131,12 +131,13 @@ const COLORS = {
   'engineering':     {bar:'#5f5e5a', dot:'#5f5e5a', txt:'#444441', bg:'#f1efe8'}
 };
 const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MF = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const params = new URLSearchParams(location.search);
 let FEED_URL = params.get('feed') || './events.sample.json';
 if (FEED_URL === 'live') FEED_URL = SUBSCRIBE_BASE + '?feed=events.json';
 
-let DATA=null, active=new Set(), view='week', selUid=null, weekStart=null;
+let DATA=null, active=new Set(), view='month', selUid=null, curY, curM;
 const $ = id => document.getElementById(id);
 const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const pad = n => (n<10?'0':'')+n;
@@ -144,15 +145,14 @@ const pad = n => (n<10?'0':'')+n;
 fetch(FEED_URL,{cache:'no-cache'}).then(r=>r.json()).then(d=>{
   DATA=d; active=new Set((d.facets.disciplines||[]).map(x=>x.slug));
   var keys=(d.events||[]).map(e=>fmt(e.start).key).sort();
-  weekStart = weekStartOf(new Date((keys[0]||todayKey_())+'T12:00:00'));
+  var k0=keys[0]||todayKey_(); curY=+k0.slice(0,4); curM=+k0.slice(5,7)-1;
   render();
 }).catch(e=>{ $('view').innerHTML='<div class="empty">Could not load '+esc(FEED_URL)+': '+esc(e.message)+'</div>'; });
 
-function render(){ renderChips(); renderNav(); renderDetail(); (view==='week'?renderWeek:renderList)(); renderSubscribe(); syncToggle(); }
+function render(){ renderChips(); renderNav(); renderDetail(); (view==='month'?renderMonth:renderList)(); renderSubscribe(); syncToggle(); }
 function labelOf(s){ const m=(DATA.facets.disciplines||[]).find(x=>x.slug===s); return m?m.label:s; }
 function filtered(){ return (DATA.events||[]).filter(e=>e.disciplines.some(d=>active.has(d))); }
 function todayKey_(){ return new Intl.DateTimeFormat('en-CA',{timeZone:DATA?DATA.timezone:'America/Los_Angeles'}).format(new Date()); }
-function weekStartOf(d){ var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()-x.getDay()); return x; }
 
 function renderChips(){
   let h='';
@@ -176,32 +176,32 @@ function fmt(t){
 function dayHeading(d2){ return new Intl.DateTimeFormat('en',{weekday:'long',month:'short',day:'numeric',timeZone:DATA.timezone}).format(d2); }
 
 function renderNav(){
-  if(view!=='week'){ $('nav').innerHTML=''; return; }
-  const end=new Date(weekStart); end.setDate(end.getDate()+6);
-  const rng = M[weekStart.getMonth()]+' '+weekStart.getDate()+' – '+(weekStart.getMonth()===end.getMonth()?'':M[end.getMonth()]+' ')+end.getDate();
-  $('nav').innerHTML='<button id="pw">‹</button><span class="rng">'+rng+'</span><button id="nw">›</button><button id="tw">This week</button>';
-  $('pw').onclick=()=>{ weekStart.setDate(weekStart.getDate()-7); weekStart=new Date(weekStart); render(); };
-  $('nw').onclick=()=>{ weekStart.setDate(weekStart.getDate()+7); weekStart=new Date(weekStart); render(); };
-  $('tw').onclick=()=>{ weekStart=weekStartOf(new Date(todayKey_()+'T12:00:00')); render(); };
+  if(view!=='month'){ $('nav').innerHTML=''; return; }
+  $('nav').innerHTML='<button id="pm">‹</button><span class="rng">'+MF[curM]+' '+curY+'</span><button id="nm">›</button><button id="tm">Today</button>';
+  $('pm').onclick=()=>{ curM--; if(curM<0){curM=11;curY--;} render(); };
+  $('nm').onclick=()=>{ curM++; if(curM>11){curM=0;curY++;} render(); };
+  $('tm').onclick=()=>{ var k=todayKey_(); curY=+k.slice(0,4); curM=+k.slice(5,7)-1; render(); };
 }
 
-function renderWeek(){
+function renderMonth(){
   const byDay={}; filtered().forEach(e=>{ const k=fmt(e.start).key; (byDay[k]=byDay[k]||[]).push(e); });
   const tk=todayKey_();
-  let h='<div class="week">';
-  for(let i=0;i<7;i++){
-    const cd=new Date(weekStart); cd.setDate(cd.getDate()+i);
-    const key=cd.getFullYear()+'-'+pad(cd.getMonth()+1)+'-'+pad(cd.getDate());
+  const first=new Date(curY,curM,1), startDow=first.getDay();
+  let h='<div class="cal">';
+  DOW.forEach(d=>h+='<div class="dow">'+d+'</div>');
+  for(let i=0;i<42;i++){
+    const cd=new Date(curY,curM,1-startDow+i), mo=cd.getMonth(), da=cd.getDate();
+    const key=cd.getFullYear()+'-'+pad(mo+1)+'-'+pad(da);
     const evs=(byDay[key]||[]).sort((a,b)=>(a.start.dateTime||a.start.date)<(b.start.dateTime||b.start.date)?-1:1);
-    h+='<div class="wcol"><div class="wh'+(key===tk?' today':'')+'">'+DOW[i]+'<b>'+cd.getDate()+'</b></div>';
-    if(!evs.length) h+='<div class="empty-col">·</div>';
-    evs.forEach(e=>{ const c=COLORS[e.disciplines[0]]||{bar:'#888',bg:'#eee',txt:'#444'}; const f=fmt(e.start);
-      h+='<button class="cev" data-u="'+esc(e.uid)+'" style="border-left-color:'+c.bar+';background:'+c.bg+';color:'+c.txt+'"><span class="ct">'+(e.allDay?'all day':esc(f.t))+'</span>'+esc(e.title)+'</button>'; });
+    h+='<div class="cell'+(mo!==curM?' dim':'')+(key===tk?' today':'')+'"><div class="cnum">'+da+'</div>';
+    evs.slice(0,3).forEach(e=>{ const c=COLORS[e.disciplines[0]]||{bar:'#888',bg:'#eee',txt:'#444'}; const f=fmt(e.start);
+      h+='<button class="mev" data-u="'+esc(e.uid)+'" style="border-left-color:'+c.bar+';background:'+c.bg+';color:'+c.txt+'">'+(e.allDay?'':esc(f.t)+' ')+esc(e.title)+'</button>'; });
+    if(evs.length>3) h+='<div class="more">+'+(evs.length-3)+' more</div>';
     h+='</div>';
   }
   h+='</div>';
   $('view').innerHTML=h;
-  $('view').querySelectorAll('.cev').forEach(el=>el.onclick=()=>{ selUid=el.dataset.u; renderDetail(true); });
+  $('view').querySelectorAll('.mev').forEach(el=>el.onclick=()=>{ selUid=el.dataset.u; renderDetail(true); });
 }
 
 function renderList(){
