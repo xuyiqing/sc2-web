@@ -133,7 +133,7 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const pad = n => (n<10?'0':'')+n;
 
-fetch(FEED_URL).then(r=>r.json()).then(d=>{
+fetch(FEED_URL,{cache:'no-cache'}).then(r=>r.json()).then(d=>{
   DATA=d; active=new Set((d.facets.disciplines||[]).map(x=>x.slug));
   var f=(d.events||[]).map(e=>e.start.dateTime||e.start.date).sort()[0] || new Date().toISOString();
   curY=+f.slice(0,4); curM=+f.slice(5,7)-1;
@@ -257,7 +257,15 @@ function renderSubscribe(){
   $('copy').onclick=()=>{ navigator.clipboard&&navigator.clipboard.writeText(url); $('copy').textContent='Copied'; setTimeout(()=>$('copy').textContent='Copy .ics link',1200); };
   $('addg').onclick=()=>{ window.open('https://calendar.google.com/calendar/u/0/r/settings/addbyurl?url='+encodeURIComponent(url),'_blank'); };
   $('emailbtn').onclick=()=>{ const n=$('emailnote'); n.style.display='block';
-    n.innerHTML='Weekly email for <b>'+(slugs.length||0)+'</b> discipline'+(slugs.length===1?'':'s')+' — list signup coming soon. You\'ll get a Sunday-night digest of the week ahead for: '+slugs.map(labelOf).map(esc).join(', ')+'.'; };
+    const groups=(DATA.subscribe&&DATA.subscribe.groups)||[];
+    const rel=groups.filter(g=>!g.disciplines.length||g.disciplines.some(d=>active.has(d)));
+    if(rel.length){
+      n.innerHTML='Join the Sunday-night digest — '+rel.map(g=>g.join?'<a href="'+esc(g.join)+'" target="_blank" rel="noopener">'+esc(g.label||'Weekly')+' ↗</a>':esc(g.label||'Weekly')).join(' · ')+
+        '<div style="margin-top:5px;color:var(--faint)">A weekly email of the week ahead for your disciplines; unsubscribe any time from the list.</div>';
+    } else {
+      n.innerHTML='Weekly email for <b>'+(slugs.length||0)+'</b> discipline'+(slugs.length===1?'':'s')+' — list signup coming soon.';
+    }
+  };
 }
 </script>
 </body>

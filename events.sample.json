@@ -13,6 +13,13 @@
     ],
     "topics": ["causal-inference", "machine-learning", "statistics", "econometrics", "political-methodology", "reproducibility", "epidemiology", "health-policy", "health-economics", "clinical-trials", "genomics", "foundation-models", "optimization", "deadlines-cfp"]
   },
+  "subscribe": {
+    "groups": [
+      { "label": "Weekly (all)", "join": "https://groups.google.com/g/sc2-weekly", "disciplines": [] },
+      { "label": "Methodology", "join": "https://groups.google.com/g/sc2-methodology", "disciplines": ["methodology"] },
+      { "label": "Biomedicine", "join": "https://groups.google.com/g/sc2-biomedicine", "disciplines": ["biomedicine"] }
+    ]
+  },
   "events": [
     {
       "uid": "demo-ocis-conformal@sc2.events",
