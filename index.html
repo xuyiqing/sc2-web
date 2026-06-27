@@ -4,75 +4,84 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SC² events</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#fbfbfa; --card:#fff; --line:#e7e6e1; --ink:#1f1f1d; --mut:#6b6a64; --faint:#94938c;
-    --accent:#185FA5; --accent-bg:#E6F1FB; --warn:#854F0B; --warn-bg:#FAEEDA; --warn-line:#EF9F27;
+    --bg:#ffffff; --bg2:#f7f6f4; --card:#fff; --line:#e4e2dc; --ink:#2e2d29; --mut:#54534d; --faint:#8a887f;
+    --red:#8C1515; --red-2:#b1040e; --red-bg:#fbeeee; --red-line:#d9a0a0;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-  .wrap{max-width:960px;margin:0 auto;padding:26px 18px 64px}
-  h1{font-size:22px;font-weight:600;margin:0}
-  .sub{color:var(--mut);font-size:14px;margin:2px 0 16px}
-  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
-  .step{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.02em;text-transform:uppercase}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 'Source Sans 3',-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:0 auto;padding:24px 18px 64px}
+  .top{border-bottom:3px solid var(--red);padding-bottom:10px;margin-bottom:18px}
+  h1{font-size:23px;font-weight:700;margin:0;letter-spacing:-.01em}
+  .sub{color:var(--mut);font-size:14px;margin:2px 0 0}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+  .step{font-size:12px;font-weight:700;color:var(--red);letter-spacing:.04em;text-transform:uppercase}
+  .hint{font-size:13px;color:var(--mut);margin:3px 0 10px}
   .subgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
   @media(max-width:640px){.subgrid{grid-template-columns:1fr}}
-  .mode{border:1px solid var(--line);border-radius:10px;padding:12px}
-  .mode h3{margin:0 0 2px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:7px}
+  .mode{border:1px solid var(--line);border-radius:9px;padding:12px}
+  .mode h3{margin:0 0 2px;font-size:14px;font-weight:600}
   .mode p{margin:0 0 10px;font-size:12.5px;color:var(--mut)}
-  button.b{border:1px solid var(--line);background:#fff;border-radius:7px;padding:6px 12px;font-size:12.5px;cursor:pointer}
-  button.b:hover{background:#f4f3ef}
-  button.b.primary{border-color:var(--accent);color:var(--accent)}
-  .u{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--accent);margin-top:8px;word-break:break-all}
+  button.b{border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 12px;font-size:12.5px;cursor:pointer;font-family:inherit;color:var(--ink)}
+  button.b:hover{background:var(--bg2)}
+  button.b.primary{background:var(--red);border-color:var(--red);color:#fff}
+  button.b.primary:hover{background:var(--red-2)}
+  .u{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--mut);margin-top:8px;word-break:break-all}
   .chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-  .chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;user-select:none}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;user-select:none;font-family:inherit;color:var(--ink)}
   .chip .dot{width:9px;height:9px;border-radius:50%}
-  .chip[aria-pressed="false"]{opacity:.38}
+  .chip[aria-pressed="false"]{opacity:.4}
   .chip .x{font-size:11px;color:var(--faint)}
-  .hint{font-size:12.5px;color:var(--mut);margin:0 0 9px}
-  .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:18px 0 6px}
-  .vtoggle{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-  .vtoggle button{border:0;background:#fff;padding:6px 14px;font-size:13px;cursor:pointer;color:var(--mut)}
-  .vtoggle button[aria-pressed="true"]{background:var(--ink);color:#fff}
-  .navmonth{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600}
-  .navmonth button{border:1px solid var(--line);background:#fff;border-radius:7px;width:30px;height:30px;cursor:pointer;font-size:14px}
-  .cal{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--line);gap:1px}
-  .dow{background:#f4f3ef;color:var(--faint);font-size:11px;font-weight:600;text-align:center;padding:6px 0}
-  .cell{background:var(--card);min-height:92px;padding:5px 5px 6px}
-  .cell.dim{background:#f7f6f3}
-  .cell .num{font-size:12px;color:var(--mut);text-align:right}
-  .cell.today .num{color:#fff;background:var(--accent);border-radius:999px;width:20px;height:20px;line-height:20px;text-align:center;margin-left:auto;font-weight:600}
-  .cev{display:block;width:100%;text-align:left;border:0;border-radius:5px;padding:2px 6px;margin-top:3px;font-size:11px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.45}
-  .more{font-size:10.5px;color:var(--faint);margin-top:2px}
-  .day{margin:18px 0 6px;font-size:13px;font-weight:600;color:var(--mut);border-bottom:1px solid var(--line);padding-bottom:6px}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:18px 0 8px}
+  .navw{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600}
+  .navw button{border:1px solid var(--line);background:#fff;border-radius:6px;height:30px;min-width:30px;padding:0 8px;cursor:pointer;font-size:13px;font-family:inherit;color:var(--ink)}
+  .navw .rng{min-width:128px;text-align:center}
+  .vtoggle{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+  .vtoggle button{border:0;background:#fff;padding:6px 14px;font-size:13px;cursor:pointer;color:var(--mut);font-family:inherit}
+  .vtoggle button[aria-pressed="true"]{background:var(--red);color:#fff}
+  .week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .wcol{background:#fff;min-height:150px;padding:0 0 6px;display:flex;flex-direction:column}
+  .wh{font-size:11px;font-weight:600;color:var(--faint);text-align:center;padding:6px 0 5px;border-bottom:1px solid var(--line)}
+  .wh b{display:block;font-size:15px;color:var(--ink);font-weight:700}
+  .wh.today b{color:var(--red)}
+  .wh.today{background:var(--red-bg)}
+  .cev{display:block;text-align:left;border:0;border-left:3px solid;border-radius:0 4px 4px 0;padding:3px 6px;margin:4px 4px 0;font-size:11.5px;line-height:1.35;cursor:pointer;font-family:inherit;overflow-wrap:anywhere}
+  .cev .ct{font-weight:600;display:block}
+  .empty-col{font-size:11px;color:#c9c7bf;text-align:center;padding-top:10px}
+  .day{margin:18px 0 6px;font-size:13px;font-weight:700;color:var(--mut);border-bottom:1px solid var(--line);padding-bottom:6px}
   .ev{display:flex;gap:12px;align-items:flex-start;padding:11px 6px;border-bottom:1px solid var(--line);cursor:pointer}
-  .ev:hover{background:#f4f3ef}
+  .ev:hover{background:var(--bg2)}
   .ev .accent{width:3px;align-self:stretch;flex:none}
   .date{width:52px;flex:none;text-align:center;line-height:1.15}
   .date .m{font-size:12px;color:var(--faint)}
-  .date .d{font-size:18px;font-weight:600}
+  .date .d{font-size:18px;font-weight:700}
   .date .t{font-size:11px;color:var(--faint)}
   .meta{font-size:12px;color:var(--mut);margin-top:3px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-  .badge{font-size:11px;padding:2px 8px;border-radius:999px;display:inline-flex;gap:4px;align-items:center;background:var(--warn-bg);color:var(--warn)}
-  .detail{background:#f7f6f2;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:10px 0 4px}
+  .badge{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--red-bg);color:var(--red)}
+  .detail{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:10px 0 4px}
   .detail .dh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-  .detail .dh .t{font-size:15px;font-weight:600}
+  .detail .dh .t{font-size:15px;font-weight:700}
   .detail .dh .when{font-size:12.5px;color:var(--mut);margin-top:2px}
   .detail .close{border:0;background:transparent;cursor:pointer;color:var(--faint);font-size:18px;line-height:1}
-  .callout{display:flex;align-items:center;gap:10px;margin:12px 0;padding:9px 12px;background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:8px;font-size:13px;color:var(--warn)}
-  .callout a,.callout .pill{margin-left:auto;background:#fff;border:1px solid var(--warn-line);color:var(--warn);text-decoration:none;font-size:12px;padding:4px 12px;border-radius:6px;white-space:nowrap}
+  .callout{display:flex;align-items:center;gap:10px;margin:12px 0;padding:9px 12px;background:var(--red-bg);border:1px solid var(--red-line);border-radius:8px;font-size:13px;color:var(--red)}
+  .callout a,.callout .pill{margin-left:auto;background:#fff;border:1px solid var(--red-line);color:var(--red);text-decoration:none;font-size:12px;padding:4px 12px;border-radius:6px;white-space:nowrap}
   .grid{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;font-size:13px;align-items:start;margin-top:10px}
   .k{color:var(--faint);white-space:nowrap}
   .tag{font-size:11px;padding:2px 8px;border-radius:999px;background:#eceae3;color:#444441;margin-right:4px;display:inline-block}
-  a{color:var(--accent)}
+  a{color:var(--red-2)}
   .empty{color:var(--faint);font-size:14px;padding:24px 0}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>SC² events</h1>
-  <div class="sub">Causal inference and data-driven methods, across disciplines.</div>
+  <div class="top">
+    <h1>SC² events</h1>
+    <div class="sub">Causal inference and data-driven methods, across disciplines · Stanford</div>
+  </div>
 
   <div class="panel">
     <div class="step">1 · Choose your disciplines</div>
@@ -84,8 +93,8 @@
     <div class="step">2 · Follow it your way</div>
     <div class="subgrid">
       <div class="mode">
-        <h3><i>📅</i> Add to your calendar</h3>
-        <p>A live-updating feed of your disciplines — new events appear automatically, reminders come from your own calendar app.</p>
+        <h3>Add to your calendar</h3>
+        <p>A live-updating feed of your disciplines — new events appear automatically; reminders come from your own calendar app.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="b primary" id="addg">Add to Google Calendar</button>
           <button class="b" id="copy">Copy .ics link</button>
@@ -93,7 +102,7 @@
         <div class="u" id="feedurl"></div>
       </div>
       <div class="mode">
-        <h3><i>✉️</i> Get a weekly email</h3>
+        <h3>Get a weekly email</h3>
         <p>Prefer not to use a calendar? Get a Sunday-night digest of the week ahead for your disciplines.</p>
         <button class="b" id="emailbtn">Email me weekly</button>
         <div id="emailnote" style="display:none;font-size:12.5px;color:var(--mut);margin-top:8px"></div>
@@ -102,9 +111,9 @@
   </div>
 
   <div class="bar">
-    <div class="navmonth" id="nav"></div>
+    <div class="navw" id="nav"></div>
     <div class="vtoggle" id="vtoggle">
-      <button data-v="calendar" aria-pressed="true">Calendar</button>
+      <button data-v="week" aria-pressed="true">Week</button>
       <button data-v="list" aria-pressed="false">List</button>
     </div>
   </div>
@@ -115,34 +124,35 @@
 <script>
 const SUBSCRIBE_BASE = 'https://script.google.com/macros/s/AKfycbw_TAuNxWeCchDaEo6e3o41H_DWCL3xSQ3LYde_KeGZFLa8cMWld0qKVSrjBkdnz2Rb/exec';
 const COLORS = {
-  'methodology':     {bar:'#534AB7', dot:'#534AB7', txt:'#3C3489', bg:'#EEEDFE'},
-  'biomedicine':     {bar:'#0F6E56', dot:'#0F6E56', txt:'#085041', bg:'#E1F5EE'},
-  'social-science':  {bar:'#993C1D', dot:'#993C1D', txt:'#712B13', bg:'#FAECE7'},
-  'data-science-ai': {bar:'#185FA5', dot:'#185FA5', txt:'#0C447C', bg:'#E6F1FB'},
-  'engineering':     {bar:'#5F5E5A', dot:'#5F5E5A', txt:'#444441', bg:'#F1EFE8'}
+  'methodology':     {bar:'#5b50a8', dot:'#5b50a8', txt:'#3c3489', bg:'#ecebf8'},
+  'biomedicine':     {bar:'#0f6e56', dot:'#0f6e56', txt:'#085041', bg:'#e1f5ee'},
+  'social-science':  {bar:'#b45309', dot:'#b45309', txt:'#7c3a06', bg:'#faecd9'},
+  'data-science-ai': {bar:'#185fa5', dot:'#185fa5', txt:'#0c447c', bg:'#e6f1fb'},
+  'engineering':     {bar:'#5f5e5a', dot:'#5f5e5a', txt:'#444441', bg:'#f1efe8'}
 };
 const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const MF = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const params = new URLSearchParams(location.search);
 let FEED_URL = params.get('feed') || './events.sample.json';
 if (FEED_URL === 'live') FEED_URL = SUBSCRIBE_BASE + '?feed=events.json';
 
-let DATA=null, active=new Set(), view='calendar', selUid=null, curY, curM;
+let DATA=null, active=new Set(), view='week', selUid=null, weekStart=null;
 const $ = id => document.getElementById(id);
 const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const pad = n => (n<10?'0':'')+n;
 
 fetch(FEED_URL,{cache:'no-cache'}).then(r=>r.json()).then(d=>{
   DATA=d; active=new Set((d.facets.disciplines||[]).map(x=>x.slug));
-  var f=(d.events||[]).map(e=>e.start.dateTime||e.start.date).sort()[0] || new Date().toISOString();
-  curY=+f.slice(0,4); curM=+f.slice(5,7)-1;
+  var keys=(d.events||[]).map(e=>fmt(e.start).key).sort();
+  weekStart = weekStartOf(new Date((keys[0]||todayKey_())+'T12:00:00'));
   render();
 }).catch(e=>{ $('view').innerHTML='<div class="empty">Could not load '+esc(FEED_URL)+': '+esc(e.message)+'</div>'; });
 
-function render(){ renderChips(); renderNav(); renderDetail(); (view==='calendar'?renderCalendar:renderList)(); renderSubscribe(); syncToggle(); }
+function render(){ renderChips(); renderNav(); renderDetail(); (view==='week'?renderWeek:renderList)(); renderSubscribe(); syncToggle(); }
 function labelOf(s){ const m=(DATA.facets.disciplines||[]).find(x=>x.slug===s); return m?m.label:s; }
 function filtered(){ return (DATA.events||[]).filter(e=>e.disciplines.some(d=>active.has(d))); }
+function todayKey_(){ return new Intl.DateTimeFormat('en-CA',{timeZone:DATA?DATA.timezone:'America/Los_Angeles'}).format(new Date()); }
+function weekStartOf(d){ var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()-x.getDay()); return x; }
 
 function renderChips(){
   let h='';
@@ -166,25 +176,27 @@ function fmt(t){
 function dayHeading(d2){ return new Intl.DateTimeFormat('en',{weekday:'long',month:'short',day:'numeric',timeZone:DATA.timezone}).format(d2); }
 
 function renderNav(){
-  if(view!=='calendar'){ $('nav').innerHTML=''; return; }
-  $('nav').innerHTML='<button id="pm">‹</button><span>'+MF[curM]+' '+curY+'</span><button id="nm">›</button>';
-  $('pm').onclick=()=>{ curM--; if(curM<0){curM=11;curY--;} render(); };
-  $('nm').onclick=()=>{ curM++; if(curM>11){curM=0;curY++;} render(); };
+  if(view!=='week'){ $('nav').innerHTML=''; return; }
+  const end=new Date(weekStart); end.setDate(end.getDate()+6);
+  const rng = M[weekStart.getMonth()]+' '+weekStart.getDate()+' – '+(weekStart.getMonth()===end.getMonth()?'':M[end.getMonth()]+' ')+end.getDate();
+  $('nav').innerHTML='<button id="pw">‹</button><span class="rng">'+rng+'</span><button id="nw">›</button><button id="tw">This week</button>';
+  $('pw').onclick=()=>{ weekStart.setDate(weekStart.getDate()-7); weekStart=new Date(weekStart); render(); };
+  $('nw').onclick=()=>{ weekStart.setDate(weekStart.getDate()+7); weekStart=new Date(weekStart); render(); };
+  $('tw').onclick=()=>{ weekStart=weekStartOf(new Date(todayKey_()+'T12:00:00')); render(); };
 }
 
-function renderCalendar(){
+function renderWeek(){
   const byDay={}; filtered().forEach(e=>{ const k=fmt(e.start).key; (byDay[k]=byDay[k]||[]).push(e); });
-  const todayKey=new Intl.DateTimeFormat('en-CA',{timeZone:DATA.timezone}).format(new Date());
-  const first=new Date(curY,curM,1), startDow=first.getDay();
-  let h='<div class="cal">';
-  DOW.forEach(d=>h+='<div class="dow">'+d+'</div>');
-  for(let i=0;i<42;i++){
-    const cd=new Date(curY,curM,1-startDow+i), y=cd.getFullYear(),mo=cd.getMonth(),da=cd.getDate();
-    const key=y+'-'+pad(mo+1)+'-'+pad(da), evs=(byDay[key]||[]).sort((a,b)=>(a.start.dateTime||a.start.date)<(b.start.dateTime||b.start.date)?-1:1);
-    h+='<div class="cell'+(mo!==curM?' dim':'')+(key===todayKey?' today':'')+'"><div class="num">'+da+'</div>';
-    evs.slice(0,3).forEach(e=>{ const c=COLORS[e.disciplines[0]]||{bg:'#eee',txt:'#444'}; const f=fmt(e.start);
-      h+='<button class="cev" data-u="'+esc(e.uid)+'" style="background:'+c.bg+';color:'+c.txt+'">'+(e.allDay?'':esc(f.t)+' ')+esc(e.title)+'</button>'; });
-    if(evs.length>3) h+='<div class="more">+'+(evs.length-3)+' more</div>';
+  const tk=todayKey_();
+  let h='<div class="week">';
+  for(let i=0;i<7;i++){
+    const cd=new Date(weekStart); cd.setDate(cd.getDate()+i);
+    const key=cd.getFullYear()+'-'+pad(cd.getMonth()+1)+'-'+pad(cd.getDate());
+    const evs=(byDay[key]||[]).sort((a,b)=>(a.start.dateTime||a.start.date)<(b.start.dateTime||b.start.date)?-1:1);
+    h+='<div class="wcol"><div class="wh'+(key===tk?' today':'')+'">'+DOW[i]+'<b>'+cd.getDate()+'</b></div>';
+    if(!evs.length) h+='<div class="empty-col">·</div>';
+    evs.forEach(e=>{ const c=COLORS[e.disciplines[0]]||{bar:'#888',bg:'#eee',txt:'#444'}; const f=fmt(e.start);
+      h+='<button class="cev" data-u="'+esc(e.uid)+'" style="border-left-color:'+c.bar+';background:'+c.bg+';color:'+c.txt+'"><span class="ct">'+(e.allDay?'all day':esc(f.t))+'</span>'+esc(e.title)+'</button>'; });
     h+='</div>';
   }
   h+='</div>';
