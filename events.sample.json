@@ -102,8 +102,8 @@
       "speaker": { "name": "Kelsey Fu", "affiliation": "Stanford METRICS" },
       "location": { "text": "Zoom", "online": true, "url": "https://stanford.zoom.us/j/demo" },
       "abstract": "Human–AI–robot co-discovery beyond automation, and what it means for research rigor.",
-      "links": { "canonical": "https://metrics.stanford.edu", "source": null },
-      "rsvp": { "required": "yes", "access": "list", "via": "METRICS list", "url": null, "deadline": null, "note": null }
+      "links": { "canonical": "https://mailman.stanford.edu/mailman/listinfo/metricslunch", "source": null },
+      "rsvp": { "required": "no", "access": "list", "via": "metricslunch list", "url": null, "deadline": null, "note": "Lunch ordering available via form by the Friday deadline" }
     },
     {
       "uid": "demo-qsu-synthetic@sc2.events",
